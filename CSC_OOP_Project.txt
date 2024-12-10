@@ -1,0 +1,159 @@
+abstract class Product {
+    private String name;
+    private double price;
+    private String category;
+
+    public Product(String name, double price, String category) {
+        this.name = name;
+        this.price = price;
+        this.category = category;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{name='" + name + "', price=" + price + ", category='" + category + "'}";
+    }
+}
+
+class Electronics extends Product {
+    public Electronics(String name, double price) {
+        super(name, price, "Electronics");
+    }
+}
+
+class Clothing extends Product {
+    public Clothing(String name, double price) {
+        super(name, price, "Clothing");
+    }
+}
+
+class Grocery extends Product {
+    public Grocery(String name, double price) {
+        super(name, price, "Grocery");
+    }
+}
+abstract class User {
+    private String name;
+    private String email;
+
+    public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    @Override
+    public String toString() {
+        return "User{name='" + name + "', email='" + email + "'}";
+    }
+}
+
+class Customer extends User {
+    public Customer(String name, String email) {
+        super(name, email);
+    }
+}
+
+class Admin extends User {
+    public Admin(String name, String email) {
+        super(name, email);
+    }
+}
+import java.util.List;
+
+class Order {
+    private List<Product> products;
+    private Customer customer;
+
+    public Order(List<Product> products, Customer customer) {
+        this.products = products;
+        this.customer = customer;
+    }
+
+    public double calculateTotal() {
+        return products.stream()
+                       .mapToDouble(Product::getPrice)
+                       .sum();
+    }
+
+    public double calculateTotalWithTax(double taxRate) {
+        return calculateTotal() * (1 + taxRate);
+    }
+
+    @Override
+    public String toString() {
+        return "Order{products=" + products + ", customer=" + customer.getName() + "}";
+    }
+}
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ProductUtils {
+    public static List<Product> filterByCategory(List<Product> products, String category) {
+        return products.stream()
+                       .filter(product -> product.getCategory().equalsIgnoreCase(category))
+                       .collect(Collectors.toList());
+    }
+}
+public class DiscountUtils {
+    public static double applyDiscount(List<Product> products, double discountRate) {
+        return products.stream()
+                       .mapToDouble(product -> product.getPrice() * (1 - discountRate))
+                       .sum();
+    }
+}
+public class SearchUtils {
+    public static List<Product> searchByName(List<Product> products, String keyword) {
+        return products.stream()
+                       .filter(product -> product.getName().toLowerCase().contains(keyword.toLowerCase()))
+                       .collect(Collectors.toList());
+    }
+}
+import java.util.Comparator;
+import java.util.List;
+
+public class OrderUtils {
+    public static List<Order> sortOrdersByTotal(List<Order> orders) {
+        return orders.stream()
+                     .sorted(Comparator.comparingDouble(Order::calculateTotal))
+                     .collect(Collectors.toList());
+    }
+}
+import java.util.ArrayList;
+import java.util.List;
+
+public class Main {
+    public static void main(String[] args) {
+        // Create Products
+        Product phone = new Electronics("Smartphone", 999.99);
+        Product tshirt = new Clothing("T-shirt", 19.99);
+        Product apples = new Grocery("Apples", 5.99);
+
+        List<Product> products = List.of(phone, tshirt, apples);
+
+        // Create Customer
+        Customer customer = new Customer("John Doe", "john@example.com");
+
+        // Create Order
+        Order order = new Order(products, customer);
+        System.out.println("Order Total: $" + order.calculateTotal());
+        System.out.println("Order Total with Tax: $"
